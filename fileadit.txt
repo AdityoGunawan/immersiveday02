@@ -1,1 +1,540 @@
-haloo dunia tipu-tipu...
+openapi: 3.0.0
+servers:
+  # Added by API Auto Mocking Plugin
+  - description: SwaggerHub API Auto Mocking
+    url: https://virtserver.swaggerhub.com/IKAPUTRI23221_1/E-Commerce/1.0.0
+info:
+  version: "1.0.0"
+  title: E-Commerce
+  description: API E-Commerce ALTA
+tags:
+  
+  - name: Auth
+    description: Authentication
+  - name: Users
+    description: User control
+  - name: Products
+    description: Product data management
+  - name: Cart
+    description: Product on cart
+  - name: Order
+    description: Order management
+  
+paths:
+  /login:
+    post:
+      tags:
+        - Auth
+      summary: login user
+      description: Login user
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/requestLogin'
+            
+      responses:
+        '200':
+          description: Success Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responseLoginSuccess'
+              examples:
+                responseData:
+                  description: response success
+                  value: {
+                    code: 200,
+                    status: "success",
+                    message: "Login Success",
+                    data: {
+                      token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdXRob3JpemVkIjp0cnVlLCJleHAiOjE2MzgzMjYxODAsInVzZXJJZCI6MSwidXNlcm5hbWUiOiJhZG1pbiJ9.AebFR-oQjUSOMez2ucDWkiMrS2eQIPmcYm5c71qZ_co"
+                    }
+                  }
+                
+
+        '400':
+          description: Failed Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/failedResponse'
+              examples:
+                responseData1:
+                  description: response failed 1
+                  value: {
+                    code: 400,
+                    status: "failed",
+                    message: "Login Failed. Email and Password incorrect."
+                  }
+                responseData2:
+                  description: response failed 2
+                  value: {
+                    code: 400,
+                    status: "failed",
+                    message: "Login Failed. Your email doesn't match any entry"
+                  }
+ 
+  /register:
+
+   post:
+      tags:
+        - Auth
+      summary: register
+      description: Register user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/requestUserData'
+            examples:
+              userData:
+                description: "Example data user"
+                value: {
+                  name: "Alta",
+                  email: "alta@alterra.id",
+                  password: "inipassword",
+                  address: "Jakarta"
+                  
+                }
+    
+              
+      responses:
+        '200':
+          $ref: '#/components/responses/responseSuccess'
+        '400':
+          $ref: '#/components/responses/responseFailed'
+
+ 
+  ####################################
+  #  USERS
+  ####################################
+  /profile:
+   get: 
+    tags:
+     - Users
+    summary: Profile user
+    description: Profile user
+    security:
+      - JWTAuth: []
+    responses:
+      '200':
+        $ref: '#/components/responses/getMyProfile'
+
+  /profile/product:
+    get:
+      tags: 
+        - Users
+      summary: List product User
+      description: List product user
+      security:
+        - JWTAuth: []
+      responses:
+        '200':
+          $ref: '#/components/responses/getAllProductSuccess'
+
+    
+        
+
+  /users:
+  
+    put:
+      tags:
+        - Users
+      summary: Update data user
+      description: Edit user profile
+      security:
+        - JWTAuth: []
+      
+      
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  example: Alterra Academy
+                email:
+                  type: string
+                  example: alta@gmail.com
+                password:
+                  type: string
+                  example: inipasswordbaru
+                address:
+                  type: string
+                  example: Depok
+      responses:
+        '200':
+          $ref: '#/components/responses/responseSuccess'
+        '400':
+          $ref: '#/components/responses/responseFailed'
+    delete:
+      tags:
+        - Users
+      summary: Delete user
+      description: Delete User by ID
+      security:
+        - JWTAuth: []
+      
+      responses:
+        '200':
+          $ref: '#/components/responses/responseSuccess'
+        '400':
+          $ref: '#/components/responses/responseFailed'
+  /users/{username}:
+    get:
+      tags:
+        - Users
+      description: Get User by ID
+      security:
+        - JWTAuth: []
+      parameters:
+        - name: username
+          description: username
+          in: path
+          schema:
+            type: string
+            example: Alta
+          required: true
+      responses:
+        '200':
+          $ref: '#/components/responses/getUserProfileSuccess'
+        '404':
+          $ref: '#/components/responses/getUserProfileFailed'
+
+  ####################################
+  #  PRODUCTS
+  ####################################
+  /product:
+    get:
+      tags:
+        - Products
+      summary: Get all product
+      description: Get all Products
+      responses:
+        '200':
+          $ref: '#/components/responses/getAllProductSuccess'
+
+    post:
+      tags:
+        - Products
+      summary: Posting product
+      description: Insert new Product
+      security:
+        - JWTAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  example: Iphonge
+                price:
+                  type: integer
+                  example: 500
+                category_id:
+                  type: integer
+                  example: 1
+                foto:
+                  type: string
+                  example: 324234234.jpg
+                description:
+                  type: string
+                  example: ini adalah deskripisi dari produk-produk yang akan diisi
+      responses:
+        '200':
+          $ref: '#/components/responses/responseSuccess'
+        '400':
+          $ref: '#/components/responses/responseFailed'  
+    
+      
+  /product/search/:
+    get:
+      tags:
+        - Products
+      description: Search product by keyword
+      parameters:
+      - in: query
+        name: name
+        schema:
+          type: string
+          example: samsoong
+     
+      responses:
+        '200':
+          $ref: '#/components/responses/searchProductByKeywordSuccess'
+        '400':
+          $ref: '#/components/responses/responseFailed'
+  
+####################################
+  #  CART
+####################################
+
+  /cart:
+    post: 
+      tags: 
+        - Cart 
+      summary: Add product to cart
+      security:
+        - JWTAuth: []
+      description: Add product to cart
+      requestBody: 
+        content:
+          application/json:
+            schema : 
+              type: object
+              properties:
+                  product_id:
+                    type: integer
+                    example: 1
+      responses:
+        '200':
+          $ref: '#/components/responses/responseSuccess'
+    get:
+
+      tags: 
+        - Cart
+      summary: List product on cart
+      description: Product on Cart
+      security:
+        - JWTAuth: []
+      responses:
+        '200':
+          $ref: '#/components/responses/responseOnCart'
+####################################
+  #  ORDER
+####################################
+  /order/checkout:
+    post:
+      tags:
+        - Order
+      summary: Order Product
+      description: Order product
+      security:
+        - JWTAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema: 
+              type: object
+              properties:
+                payment_method:
+                  type: string
+                  example: COD
+                address:
+                  type: string
+                  example: Depok
+      responses:
+        '200':
+          $ref: '#/components/responses/responseOrder'
+
+  /order/cart:
+    post:
+      tags:
+        - Order
+      summary: Order by cart
+      description: Order by Cart
+      security:
+        - JWTAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema: 
+              type: object
+              properties:
+                payment_method:
+                  type: string
+                  example: COD
+                address:
+                  type: string
+                  example: Depok
+      responses: 
+        '200':
+          $ref: '#/components/responses/responseOrder'
+
+
+#==================================#
+#    COMPONENT
+#==================================#
+components:
+
+  #==================================#    
+  #    JWT
+  #==================================#
+  securitySchemes:
+    JWTAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: "use Token"
+  #==================================#
+  #    SCHEMAS
+  #==================================#
+  schemas:
+    requestLogin:
+      type: object
+      properties:
+        "email":
+          type: string
+          minLength: 1
+        "password":
+          type: string
+          minLength: 1
+    requestUserData:
+      type: object
+      properties:
+        "name":
+          type: string
+          minLength: 1
+        "email":
+          type: string
+          minLength: 1
+        "password":
+          type: string
+          minLength: 1
+        "address":
+          type: string
+          minLength: 1
+    responseUserData:
+      type: object
+      properties:
+        "id":
+          type: number
+          minLength: 1
+        "name":
+          type: string
+          minLength: 1
+        "email":
+          type: string
+          minLength: 1
+        "address":
+          type: string
+          minLength: 1
+    successGetSingleUserResponse:
+      type: object
+      properties: {
+        "code":{
+          type: number
+        },
+        "message": {
+          type: string
+        },
+        "status": {
+          type: string
+        },
+        "data": {
+          type: object
+        }
+      }
+    successGetAllUserResponse:
+      type: object
+      properties: {
+        "code":{
+          type: number
+        },
+        "message": {
+          type: string
+        },
+        "status": {
+          type: string
+        },
+        "data": {
+          type: array,
+          items: {
+            type: object
+          }
+        }
+      }
+
+    requestProduct:
+      type: object
+      properties:
+        "name":
+          type: string
+          minLength: 1
+        "price":
+          type: number
+        "quantity":
+          type: number
+          minLength: 1
+        "description":
+          type: string
+          minLength: 1
+    responseLoginSuccess:
+      type: object
+      properties: {
+        "code":{
+          type: number
+        },
+        "message": {
+          type: string
+        },
+        "status": {
+          type: string
+        },
+        "data":{
+          type: object
+        }
+      }
+    successResponse:
+      type: object
+      properties: {
+        "code":{
+          type: number
+        },
+        "message": {
+          type: string
+        },
+        "status": {
+          type: string
+        }
+      }
+    failedResponse:
+      type: object
+      properties: {
+        "code":{
+          type: number
+        },
+        "message": {
+          type: string
+        },
+        "status": {
+          type: string
+        }
+      }
+    
+  #==================================#    
+  #    PARAMETERS
+  #==================================#
+  # parameters:
+  #   dataProduct:
+  #     name: "dataProduct"
+  #     in: query 
+
+  requestBodies:
+    userData:
+      content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/requestUserData'
+              type: object
+              properties:
+                name:
+                  type: string
+                  example: Alta
+                email:
+                  type: string
+                  example: alta@mail.com
+                password:
+                  type: string
+                  example: inipassword
+                address:
+                  type: string
+                  example: Jakarta
+
+  responses:
